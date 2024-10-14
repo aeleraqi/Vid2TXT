@@ -1,38 +1,44 @@
+import os
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
-from src.speech_recognition_utils import recognize_speech_google
-from datetime import datetime, timedelta
+import speech_recognition as sr
 
-def process_audio_file(audio_file: str):
+def process_audio_file(audio_file_path):
     """
-    Process an audio file to recognize speech and return the output data.
+    Process the audio file to recognize speech and return recognized text with timestamps.
     """
     # Load the audio file
-    audio = AudioSegment.from_file(audio_file)
+    audio = AudioSegment.from_file(audio_file_path)
 
     # Split audio into chunks based on silence
     chunks = split_on_silence(audio, min_silence_len=500, silence_thresh=-40)
 
     output_data = []
-    start_time = datetime.now()
+    recognizer = sr.Recognizer()
 
     # Process each chunk
-    for chunk in chunks:
+    for i, chunk in enumerate(chunks):
         # Export each chunk to a temporary wav file
-        chunk.export("temp.wav", format="wav")
+        chunk.export("temp_chunk.wav", format="wav")
 
         # Recognize speech from the exported chunk
-        text = recognize_speech_google("temp.wav")
+        with sr.AudioFile("temp_chunk.wav") as source:
+            audio_data = recognizer.record(source)
+            try:
+                # Recognize the audio, assuming the language is Arabic
+                text = recognizer.recognize_google(audio_data, language='ar-EG')
+            except sr.UnknownValueError:
+                text = "(Could not understand)"
+            except sr.RequestError as e:
+                text = f"(Error: {e})"
 
-        # Calculate timestamp for the chunk
-        duration = timedelta(seconds=chunk.duration_seconds)
-        end_time = start_time + duration
-        timestamp = end_time.strftime("%H:%M:%S")
+        # Calculate the timestamp for the chunk
+        timestamp = i * chunk.duration_seconds
 
-        # Append timestamp and recognized text to the output data
-        output_data.append((timestamp, text))
+        # Append recognized text and timestamp to output data
+        output_data.append({"timestamp": timestamp, "text": text})
 
-        # Update start time for the next chunk
-        start_time = end_time
+    # Clean up temporary file
+    os.remove("temp_chunk.wav")
 
     return output_data

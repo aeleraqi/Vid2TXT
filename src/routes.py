@@ -1,22 +1,26 @@
-from fastapi import APIRouter, UploadFile, File
+import requests
+from fastapi import APIRouter, HTTPException
 from src.audio_processing import process_audio_file
 import os
 
 router = APIRouter()
-
 @router.post("/process-audio/")
-async def process_audio(file: UploadFile = File(...)):
+async def process_audio(file_url: str):
     """
-    Endpoint to process the uploaded audio file.
+    Endpoint to process the audio file from a URL.
     """
-    # Save the uploaded file
-    audio_file_path = f"temp_{file.filename}"
-    with open(audio_file_path, "wb") as audio_file:
-        audio_file.write(await file.read())
+    # Download the audio file from the given URL
+    audio_file_path = "temp_audio.m4a"
+    try:
+        response = requests.get(file_url)
+        response.raise_for_status()  # Check if the download was successful
+        with open(audio_file_path, "wb") as audio_file:
+            audio_file.write(response.content)
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Failed to download audio file: {e}")
 
     # Process the audio file to get recognized text and timestamps
     output_data = process_audio_file(audio_file_path)
-
 
     # Clean up the temporary audio file
     os.remove(audio_file_path)
