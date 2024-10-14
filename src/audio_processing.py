@@ -1,6 +1,6 @@
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
-from speech_recognition_utils import recognize_speech_google
+from src.speech_recognition_utils import recognize_speech_google
 from datetime import datetime, timedelta
 
 def process_audio_file(audio_file: str):

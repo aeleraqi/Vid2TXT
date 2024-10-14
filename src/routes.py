@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File
-from audio_processing import process_audio_file
+from src.audio_processing import process_audio_file
 import os
 
 router = APIRouter()
