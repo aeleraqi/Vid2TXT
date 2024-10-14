@@ -1,6 +1,5 @@
 from fastapi import APIRouter, UploadFile, File
 from audio_processing import process_audio_file
-from document_generator import generate_docx
 import os
 
 router = APIRouter()
@@ -18,11 +17,8 @@ async def process_audio(file: UploadFile = File(...)):
     # Process the audio file to get recognized text and timestamps
     output_data = process_audio_file(audio_file_path)
 
-    # Generate the output DOCX file
-    output_docx_path = "output.docx"
-    generate_docx(output_data, output_docx_path)
 
     # Clean up the temporary audio file
     os.remove(audio_file_path)
 
-    return {"message": "Processing completed", "output_docx": output_docx_path}
+    return {"message": "Processing completed", "output": output_data}
