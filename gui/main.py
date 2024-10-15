@@ -7,7 +7,11 @@ data = {
     "file_url": '',
     "language": ""
 }
-
+def check():
+    if data["file_url"] != '' and data['language']:
+        process_button.configure(state='enabled')
+    else:
+        process_button.configure(state='disabled')
 def process():
     output = process_audio_file(data["file_url"], data["language"])
     print("output: "+ output)
@@ -20,6 +24,7 @@ def open_file():
     # Update the button text to show the selected file path
     file_name = os.path.basename(file_path)
     open_button.configure(text=file_name)
+    check()
 # Set the appearance and theme
 ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
 
