@@ -1,5 +1,5 @@
 from tkinter import filedialog as fd
-from tkinter.messagebox import showinfo
+
 def select_file():
     filetypes = (
         ('Audio Files', '*.m4a'),
@@ -8,9 +8,10 @@ def select_file():
     filename = fd.askopenfilename(
         title='Open a file',
         initialdir='/',
-        filetypes=filetypes)
-
-    showinfo(
-        title='Selected File',
-        message=filename
+        filetypes=filetypes
     )
+
+    if filename:  # If a file is selected, return its path
+        return filename
+    else:  # Raise an error if no file is selected
+        raise FileNotFoundError("No file was selected.")
