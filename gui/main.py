@@ -34,7 +34,6 @@ def on_select(event):
     selected_language = language_var.get()
     selected_language_code = languages[selected_language]
     data.update({'language': selected_language_code})
-    print(f"Selected Language: {selected_language_code}")
     check()
 
 # Set the appearance and theme
