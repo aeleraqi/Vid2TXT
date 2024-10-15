@@ -18,7 +18,7 @@ def open_file():
         open_button.configure(text=file_name)
     except FileNotFoundError:
         # Display the error message if no file was selected
-        ctk.CTkMessagebox.show_error("File Not Found", "Please select an audio file to continue.")
+        print("No file")
 
 # Set the appearance and theme
 ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
