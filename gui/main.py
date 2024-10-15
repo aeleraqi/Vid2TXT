@@ -8,14 +8,17 @@ data = {
     "file_url": '',
     "language": "en-US"
 }
+
 def check():
     if data["file_url"] != '' and data['language']:
         process_button.configure(state='enabled')
     else:
         process_button.configure(state='disabled')
+
 def process():
     output = process_audio_file(data["file_url"], data["language"])
-    print("output: "+ output)
+    output_textbox.delete("1.0", ctk.END)  # Clear previous output
+    output_textbox.insert("1.0", output)  # Insert new output
 
 def open_file():
     # Attempt to select a file
@@ -40,7 +43,7 @@ ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
 # Create the main application window
 app = ctk.CTk()
 app.geometry("600x400")
-app.title("Audio to text")
+app.title("Audio to Text")
 
 # Create a frame to hold the widgets
 frame = ctk.CTkFrame(app)
@@ -56,18 +59,37 @@ open_button = ctk.CTkButton(
     text='Open a File',
     command=open_file
 )
-language_var = ctk.StringVar(value=list(languages.keys())[0])
+open_button.pack(expand=True)
+
+# Create a StringVar for the dropdown menu
+language_var = ctk.StringVar(value=list(languages.keys())[0])  # Default to the first language
+# Create the dropdown menu (CTkOptionMenu)
 dropdown = ctk.CTkOptionMenu(frame, variable=language_var, values=list(languages.keys()), command=on_select)
 dropdown.pack(pady=20)
+
+# Create the process button
 process_button = ctk.CTkButton(
     frame,
     text='Convert',
     command=process,
     state="disabled"
 )
-
-open_button.pack(expand=True)
 process_button.pack(expand=True)
+
+# Create a frame for the output text area
+output_frame = ctk.CTkFrame(frame)
+output_frame.pack(pady=20, fill="both", expand=True)
+
+# Create a scrollable text area for output
+output_textbox = ctk.CTkTextbox(output_frame, wrap="word")
+output_textbox.pack(side="left", fill="both", expand=True)
+
+# Create a vertical scrollbar for the text area
+scrollbar = ctk.CTkScrollbar(output_frame, command=output_textbox.yview)
+scrollbar.pack(side="right", fill="y")
+
+# Configure the textbox to work with the scrollbar
+output_textbox.configure(yscrollcommand=scrollbar.set)
 
 # Run the application
 app.mainloop()
