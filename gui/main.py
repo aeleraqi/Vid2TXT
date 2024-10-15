@@ -8,7 +8,7 @@ data = {
     "language": ""
 }
 
-def proces():
+def process():
     output = process_audio_file(data["file_url"], data["language"])
     print("output: "+ output)
 
@@ -42,8 +42,15 @@ open_button = ctk.CTkButton(
     text='Open a File',
     command=open_file
 )
+process_button = ctk.CTkButton(
+    frame,
+    text='Convert',
+    command=process,
+    state="disabled"
+)
 
 open_button.pack(expand=True)
+process_button.pack(expand=True)
 
 # Run the application
 app.mainloop()
