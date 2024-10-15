@@ -10,6 +10,7 @@ Automat==24.8.1
 beautifulsoup4==4.12.3
 billiard==4.2.1
 bleach==6.1.0
+blinker==1.8.2
 boto3==1.26.83
 botocore==1.29.165
 celery==5.4.0
@@ -40,9 +41,9 @@ django-storages==1.14.4
 djangorestframework==3.14.0
 execnb==0.1.6
 executing==2.1.0
-fastapi==0.115.2
 fastcore==1.7.15
 fastjsonschema==2.20.0
+Flask==3.0.3
 gevent==24.10.2
 greenlet==3.1.1
 hyperlink==21.0.0
@@ -54,6 +55,7 @@ ipython==8.28.0
 ipython-genutils==0.2.0
 ipywidgets==8.0.3
 itables==2.2.2
+itsdangerous==2.2.0
 jedi==0.19.1
 Jinja2==3.1.4
 jmespath==1.0.1
@@ -98,6 +100,7 @@ pyppeteer==1.0.2
 python-dateutil==2.9.0.post0
 python-docx==1.1.2
 python-dotenv==1.0.1
+python-multipart==0.0.12
 python3-openid==3.2.0
 pytz==2024.2
 pywin32==308
@@ -131,6 +134,7 @@ wcwidth==0.2.13
 webencodings==0.5.1
 websocket-client==1.8.0
 websockets==10.4
+Werkzeug==3.0.4
 whitenoise==6.7.0
 widgetsnbextension==4.0.13
 zipp==3.20.2
