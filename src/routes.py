@@ -5,9 +5,10 @@ import os
 
 router = APIRouter()
 @router.post("/process-audio/")
-async def process_audio(file_url: str):
+async def process_audio(file_url: str, language: str = "en"):
     """
     Endpoint to process the audio file from a URL.
+    Supports multiple languages for speech recognition.
     """
     # Download the audio file from the given URL
     audio_file_path = "temp_audio.m4a"
@@ -20,7 +21,7 @@ async def process_audio(file_url: str):
         raise HTTPException(status_code=400, detail=f"Failed to download audio file: {e}")
 
     # Process the audio file to get recognized text and timestamps
-    output_data = process_audio_file(audio_file_path)
+    output_data = process_audio_file(audio_file_path, language)
 
     # Clean up the temporary audio file
     os.remove(audio_file_path)
