@@ -18,7 +18,7 @@ def check():
 
 def process():
     def run_processing():
-        process_button.configure(state='disabled', text="WAIT A FEW SECONDS...")
+        process_button.configure(state='disabled', text="الصبر...هانت")
         # Perform the audio processing
         output = process_audio_file(data["file_url"], 'ar-EG')
         print(output)
@@ -34,7 +34,7 @@ def process():
         output_textbox.tag_add("center", "1.0", "end")
         
         output_textbox.configure(state="disabled")  # Disable editing again
-        process_button.configure(text="CONVERT", state='enabled')
+        process_button.configure(text="دوس", state='enabled')
 
     # Run the processing in a separate thread to avoid blocking the UI
     processing_thread = threading.Thread(target=run_processing)
@@ -56,30 +56,32 @@ ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
 # Create the main application window
 app = ctk.CTk()
 app.geometry("600x400")
-app.title("CONVERT YOUR AUDIO TO TEXT")
+app.title("يلا نحول ملف الصوت لكلام مكتوب")
 
 # Create a frame to hold the widgets
 frame = ctk.CTkFrame(app)
 frame.pack(pady=20, padx=20, fill="both", expand=True)
 
 # Add a title label to the frame
-title_label = ctk.CTkLabel(frame, text="CONVERT YOUR AUDIO TO TEXT", font=("Arial", 20))
+title_label = ctk.CTkLabel(frame, text="يلا نحول ملف الصوت لكلام مكتوب", font=("tahoma", 20))
 title_label.pack(pady=10)
 
 # Create the open file button
 open_button = ctk.CTkButton(
     frame,
-    text='Open a File',
-    command=open_file
+    text='الملف',
+    command=open_file,
+    font=("tahoma", 20)
 )
 open_button.pack(expand=True)
 
 # Create the process button
 process_button = ctk.CTkButton(
     frame,
-    text='CONVERT',
+    text='دوس',
     command=process,
-    state="disabled"
+    state="disabled",
+    font=("tahoma", 20)
 )
 process_button.pack(expand=True)
 
