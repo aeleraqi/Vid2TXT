@@ -3,6 +3,7 @@ from lib.selectFile import select_file
 from lib.audio_processing import process_audio_file
 from lib.lang import speech_recognition_languages as languages
 import os
+import threading
 
 data = {
     "file_url": '',
@@ -11,14 +12,23 @@ data = {
 
 def check():
     if data["file_url"] != '' and data['language']:
-        process_button.configure(state='enabled')
+        process_button.configure(state='normal')
     else:
         process_button.configure(state='disabled')
 
 def process():
-    output = process_audio_file(data["file_url"], data["language"])
-    output_textbox.delete("1.0", ctk.END)  # Clear previous output
-    output_textbox.insert("1.0", output)  # Insert new output
+    def run_processing():
+        process_button.configure(state='disabled', text="WAIT A FEW SECONDS...")
+        # Perform the audio processing
+        output = process_audio_file(data["file_url"], data["language"])
+        # Update the UI after processing
+        output_textbox.delete("1.0", ctk.END)  # Clear previous output
+        output_textbox.insert("1.0", output)  # Insert new output
+        process_button.configure(state='normal', text='CONVERT')
+
+    # Run the processing in a separate thread to avoid blocking the UI
+    processing_thread = threading.Thread(target=run_processing)
+    processing_thread.start()
 
 def open_file():
     # Attempt to select a file
@@ -42,14 +52,14 @@ ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
 # Create the main application window
 app = ctk.CTk()
 app.geometry("600x400")
-app.title("Audio to Text")
+app.title("CONVERT YOUR AUDIO TO TEXT")
 
 # Create a frame to hold the widgets
 frame = ctk.CTkFrame(app)
 frame.pack(pady=20, padx=20, fill="both", expand=True)
 
 # Add a title label to the frame
-title_label = ctk.CTkLabel(frame, text="Convert your audio files to text", font=("Arial", 20))
+title_label = ctk.CTkLabel(frame, text="CONVERT YOUR AUDIO TO TEXT", font=("Arial", 20))
 title_label.pack(pady=10)
 
 # Create the open file button
@@ -69,7 +79,7 @@ dropdown.pack(pady=20)
 # Create the process button
 process_button = ctk.CTkButton(
     frame,
-    text='Convert',
+    text='CONVERT',
     command=process,
     state="disabled"
 )
