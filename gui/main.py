@@ -1,17 +1,17 @@
 import customtkinter as ctk
 from lib.selectFile import select_file
 from lib.audio_processing import process_audio_file
-from lib.lang import speech_recognition_languages as languages
 import os
 import threading
+from textwrap import wrap
+from awesometkinter.bidirender import render_bidi_text, add_bidi_support
 
 data = {
     "file_url": '',
-    "language": "en-US"
 }
 
 def check():
-    if data["file_url"] != '' and data['language']:
+    if data["file_url"] != '':
         process_button.configure(state='normal')
     else:
         process_button.configure(state='disabled')
@@ -20,11 +20,21 @@ def process():
     def run_processing():
         process_button.configure(state='disabled', text="WAIT A FEW SECONDS...")
         # Perform the audio processing
-        output = process_audio_file(data["file_url"], data["language"])
+        output = process_audio_file(data["file_url"], 'ar-EG')
+        print(output)
+        
         # Update the UI after processing
+        output_textbox.configure(state="normal")  # Enable editing to insert text
         output_textbox.delete("1.0", ctk.END)  # Clear previous output
-        output_textbox.insert("1.0", output)  # Insert new output
-        process_button.configure(state='normal', text='CONVERT')
+        
+        # Reverse the text content for RTL languages
+        output = '\n'.join(wrap(output, 50))
+        output = render_bidi_text(output)  # Correctly render bidi text
+        output_textbox.insert("1.0", output)
+        output_textbox.tag_add("center", "1.0", "end")
+        
+        output_textbox.configure(state="disabled")  # Disable editing again
+        process_button.configure(text="CONVERT", state='enabled')
 
     # Run the processing in a separate thread to avoid blocking the UI
     processing_thread = threading.Thread(target=run_processing)
@@ -38,12 +48,6 @@ def open_file():
     # Update the button text to show the selected file path
     file_name = os.path.basename(file_path)
     open_button.configure(text=file_name)
-    check()
-
-def on_select(event):
-    selected_language = language_var.get()
-    selected_language_code = languages[selected_language]
-    data.update({'language': selected_language_code})
     check()
 
 # Set the appearance and theme
@@ -70,12 +74,6 @@ open_button = ctk.CTkButton(
 )
 open_button.pack(expand=True)
 
-# Create a StringVar for the dropdown menu
-language_var = ctk.StringVar(value=list(languages.keys())[0])  # Default to the first language
-# Create the dropdown menu (CTkOptionMenu)
-dropdown = ctk.CTkOptionMenu(frame, variable=language_var, values=list(languages.keys()), command=on_select)
-dropdown.pack(pady=20)
-
 # Create the process button
 process_button = ctk.CTkButton(
     frame,
@@ -90,8 +88,12 @@ output_frame = ctk.CTkFrame(frame)
 output_frame.pack(pady=20, fill="both", expand=True)
 
 # Create a scrollable text area for output
-output_textbox = ctk.CTkTextbox(output_frame, wrap="word")
+output_textbox = ctk.CTkTextbox(output_frame, wrap="word", font=('tahoma', 15))
+output_textbox.configure(state="disabled")
 output_textbox.pack(side="left", fill="both", expand=True)
+
+# Add bidirectional support to the output_textbox
+add_bidi_support(output_textbox)
 
 # Create a vertical scrollbar for the text area
 scrollbar = ctk.CTkScrollbar(output_frame, command=output_textbox.yview)
