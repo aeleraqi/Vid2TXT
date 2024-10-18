@@ -1,6 +1,7 @@
 AwesomeTkinter==2021.11.8
 certifi==2024.8.30
 charset-normalizer==3.4.0
+CTkTable==1.1
 customtkinter==5.2.2
 darkdetect==0.8.0
 idna==3.10
