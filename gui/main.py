@@ -21,7 +21,6 @@ def process():
         process_button.configure(state='disabled', text="الصبر...هانت")
         # Perform the audio processing
         output = process_audio_file(data["file_url"], 'ar-EG')
-        print(output)
         
         # Update the UI after processing
         output_textbox.configure(state="normal")  # Enable editing to insert text
