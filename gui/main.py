@@ -3,8 +3,10 @@ from lib.selectFile import select_file
 from lib.audio_processing import process_audio_file
 import os
 import threading
-from textwrap import wrap
-from awesometkinter.bidirender import render_bidi_text, add_bidi_support
+from datetime import datetime, timedelta
+from pydub.silence import split_on_silence
+from pydub import AudioSegment
+from CTkTable import *
 
 data = {
     "file_url": '',
@@ -20,19 +22,31 @@ def process():
     def run_processing():
         process_button.configure(state='disabled', text="الصبر...هانت")
         # Perform the audio processing
-        output = process_audio_file(data["file_url"], 'ar-EG')
-        
-        # Update the UI after processing
-        output_textbox.configure(state="normal")  # Enable editing to insert text
-        output_textbox.delete("1.0", ctk.END)  # Clear previous output
-        
-        # Reverse the text content for RTL languages
-        output = '\n'.join(wrap(output, 50))
-        output = render_bidi_text(output)  # Correctly render bidi text
-        output_textbox.insert("1.0", output)
-        output_textbox.tag_add("center", "1.0", "end")
-        
-        output_textbox.configure(state="disabled")  # Disable editing again
+        # Split audio into chunks based on silence
+        audio = AudioSegment.from_file(data["file_url"])
+        chunks = split_on_silence(audio, min_silence_len=500, silence_thresh=-40)
+        output_data = []
+        start_time = datetime.now()
+        # Process each chunk
+        for chunk in chunks:
+            # Export each chunk to a temporary wav file
+            chunk.export("temp.wav", format="wav")
+            # Recognize speech from the exported chunk
+            text = process_audio_file("temp.wav", 'ar-EG')
+            # Calculate timestamp for the chunk
+            duration = timedelta(seconds=chunk.duration_seconds)
+            end_time = start_time + duration
+            timestamp = end_time.strftime("%H:%M:%S")
+            # Append timestamp and recognized text to the output data
+            output_data.append((timestamp, text))
+            # Update start time for the next chunk
+            start_time = end_time
+        # Clear previous content and display the new output data
+        for widget in output_frame.winfo_children():
+            widget.destroy()
+        table = CTkTable(master=output_frame, row=len(output_data), column=2, values=output_data)
+        os.remove('temp.wav')
+        table.pack(expand=True, fill="both", padx=20, pady=20)
         process_button.configure(text="دوس", state='enabled')
 
     # Run the processing in a separate thread to avoid blocking the UI
@@ -84,24 +98,9 @@ process_button = ctk.CTkButton(
 )
 process_button.pack(expand=True)
 
-# Create a frame for the output text area
-output_frame = ctk.CTkFrame(frame)
+# Create a scrollable frame for the output
+output_frame = ctk.CTkScrollableFrame(frame)
 output_frame.pack(pady=20, fill="both", expand=True)
-
-# Create a scrollable text area for output
-output_textbox = ctk.CTkTextbox(output_frame, wrap="word", font=('tahoma', 15))
-output_textbox.configure(state="disabled")
-output_textbox.pack(side="left", fill="both", expand=True)
-
-# Add bidirectional support to the output_textbox
-add_bidi_support(output_textbox)
-
-# Create a vertical scrollbar for the text area
-scrollbar = ctk.CTkScrollbar(output_frame, command=output_textbox.yview)
-scrollbar.pack(side="right", fill="y")
-
-# Configure the textbox to work with the scrollbar
-output_textbox.configure(yscrollcommand=scrollbar.set)
 
 # Run the application
 app.mainloop()
