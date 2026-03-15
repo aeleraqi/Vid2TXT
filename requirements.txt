@@ -1,0 +1,4 @@
+moviepy>=1.0.3
+SpeechRecognition>=3.9.0
+pydub>=0.25.1
+requests>=2.28.0
